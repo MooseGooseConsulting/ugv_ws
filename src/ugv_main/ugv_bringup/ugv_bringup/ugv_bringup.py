@@ -57,6 +57,9 @@ class ugv_bringup(Node):
                         
         # Initialize the base controller with the UART port and baud rate
         self.base_controller = BaseController(serial_port_name, baud_rate)
+        # Send an explicit zero-velocity command so the base never keeps a
+        # stale motion command across a driver restart
+        self.send_zero_velocity()
         request_data = json.dumps({"T":131,"cmd":1}) + "\n"
         self.base_controller.send_command(request_data.encode())        
         # Timer to periodically execute the feedback loop
@@ -201,6 +204,11 @@ class ugv_bringup(Node):
         self.voltage_publisher_.publish(msg)
         self._maybe_low_battery_warning(msg.voltage)
 
+    # Send a zero-velocity command to the UGV as a JSON string
+    def send_zero_velocity(self):
+        data = json.dumps({'T': '13', 'X': 0.0, 'Z': 0.0}) + "\n"
+        self.base_controller.send_command(data.encode())
+
     # Callback for processing velocity commands m/s
     def cmd_vel_callback(self, msg):
         linear_velocity = msg.linear.x
@@ -310,9 +318,13 @@ class ugv_bringup(Node):
 def main(args=None):
     rclpy.init(args=args)  # Initialize ROS
     node = ugv_bringup()  # Create the UGV bringup node
-    rclpy.spin(node)  # Keep the node running
-    #node.destroy_node()  # (optional) Shutdown the node
-    rclpy.shutdown()  # Shutdown ROS
+    try:
+        rclpy.spin(node)  # Keep the node running
+    finally:
+        node.send_zero_velocity()  # Stop the base before exiting
+        node.base_controller.close()  # Close the serial port
+        node.destroy_node()  # Shutdown the node
+        rclpy.shutdown()  # Shutdown ROS
 
 if __name__ == '__main__':
     main()

@@ -53,7 +53,7 @@ class ReadLine:
 class BaseController:
     def __init__(self, uart_dev_set, baud_set):
         self.log = logging.getLogger('BaseController')
-        self.ser = serial.Serial(uart_dev_set, baud_set, timeout=0.01)  
+        self.ser = serial.Serial(uart_dev_set, baud_set, timeout=0.01, exclusive=True)  
         self.rl = ReadLine(self.ser)
         self.command_dict = {}
         self.lock = threading.Lock()
@@ -130,3 +130,7 @@ class BaseController:
                     except Exception as e:
                         print(f"Failed to send {t_key}: {e}")
                 self.command_dict.clear()  
+
+    def close(self):
+        self.running = False
+        self.ser.close()
