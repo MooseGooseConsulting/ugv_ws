@@ -36,12 +36,12 @@ ODOM_TWIST_COVARIANCE = ODOM_POSE_COVARIANCE
 ODOM_TWIST_COVARIANCE_STOP = ODOM_POSE_COVARIANCE_STOP
 
 # The raw encoder feed refreshes at only ~10 Hz while odom/odom_raw messages arrive at
-# 20 Hz, so steady motion yields alternating zero-delta and double-delta samples. A
-# single zero sample used to publish the STOP covariance (twist[0] = 1e-9), which
-# robot_localization fuses with gain 1.0 as "velocity exactly zero": BEAST-01 on
-# 2026-09-07 measured fused displacement at 0.59 x wheel. Debouncing the covariance
-# switch here is the fix; the EKF tuning is not at fault.
-STOP_COVARIANCE_AFTER_SAMPLES = 3
+# 20 Hz, so during roughly half of steady motion, load-dependent, samples alternate
+# zero-delta and double-delta. A single zero sample used to publish the STOP covariance
+# (twist[0] = 1e-9), which robot_localization fuses with gain 1.0 as "velocity exactly
+# zero": BEAST-01 on 2026-09-07 measured fused displacement at 0.59 x wheel. Debouncing
+# the covariance switch here is the fix; the EKF tuning is not at fault.
+STOP_COVARIANCE_AFTER_SAMPLES = 5
 
 
 class OdomPublisher(Node):
@@ -147,7 +147,7 @@ class OdomPublisher(Node):
         dxy = (dright + dleft) / 2.0
         dth = (dright - dleft) / self.wheel_base
 
-        # Count on the raw deltas, not vx/vw, so dt cannot mask a zero sample.
+        # Count on the raw deltas: a zero delta is a duplicate encoder reading regardless of dt.
         if dxy == 0.0 and dth == 0.0:
             self.zero_delta_samples += 1
         else:
