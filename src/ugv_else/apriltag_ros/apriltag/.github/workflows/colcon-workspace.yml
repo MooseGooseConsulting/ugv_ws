@@ -33,21 +33,23 @@ jobs:
           apt update
           apt install --no-install-recommends -y git ca-certificates
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Setup ROS environment
-        uses: ros-tooling/setup-ros@v0.7
+        uses: ros-tooling/setup-ros@649ef6bcd696da05bc27ceb3fab69d810c0daeab # v0.7
 
       - name: ROS 1 CI Action
         if: ${{ matrix.ros_version == 1 }}
-        uses: ros-tooling/action-ros-ci@v0.3
+        uses: ros-tooling/action-ros-ci@3a640b10f09b756dabe556dac5413aba369f71b0 # v0.4
         with:
           package-name: apriltag
           target-ros1-distro: ${{ matrix.ros_distribution }}
 
       - name: ROS 2 CI Action
         if: ${{ matrix.ros_version == 2 }}
-        uses: ros-tooling/action-ros-ci@v0.3
+        uses: ros-tooling/action-ros-ci@3a640b10f09b756dabe556dac5413aba369f71b0 # v0.4
         with:
           package-name: apriltag
           target-ros2-distro: ${{ matrix.ros_distribution }}
@@ -72,23 +74,24 @@ jobs:
             ros_version: 2
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          persist-credentials: false
           submodules: recursive
 
       - name: Setup ROS environment
-        uses: ros-tooling/setup-ros@v0.7
+        uses: ros-tooling/setup-ros@649ef6bcd696da05bc27ceb3fab69d810c0daeab # v0.7
 
       - name: ROS 1 CI Action
         if: ${{ matrix.ros_version == 1 }}
-        uses: ros-tooling/action-ros-ci@v0.3
+        uses: ros-tooling/action-ros-ci@3a640b10f09b756dabe556dac5413aba369f71b0 # v0.4
         with:
           package-name: apriltag
           target-ros1-distro: ${{ matrix.ros_distribution }}
 
       - name: ROS 2 CI Action
         if: ${{ matrix.ros_version == 2 }}
-        uses: ros-tooling/action-ros-ci@v0.3
+        uses: ros-tooling/action-ros-ci@3a640b10f09b756dabe556dac5413aba369f71b0 # v0.4
         with:
           package-name: apriltag
           target-ros2-distro: ${{ matrix.ros_distribution }}
@@ -104,19 +107,20 @@ jobs:
         ros_distribution: [humble, jazzy]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          persist-credentials: false
           submodules: recursive
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4
         with:
           python-version: "3.10"
 
       - name: Setup ROS environment
-        uses: ros-tooling/setup-ros@v0.7
+        uses: ros-tooling/setup-ros@649ef6bcd696da05bc27ceb3fab69d810c0daeab # v0.7
 
       - name: ROS 2 CI Action
-        uses: ros-tooling/action-ros-ci@v0.3
+        uses: ros-tooling/action-ros-ci@3a640b10f09b756dabe556dac5413aba369f71b0 # v0.4
         with:
           package-name: apriltag
           target-ros2-distro: ${{ matrix.ros_distribution }}
