@@ -52,6 +52,9 @@ window.renderMarkdown = function (content) {
 };
 
 function highlightCode(element) {
+  if (typeof hljs === "undefined") {
+    return;
+  }
   const codeElements = element.querySelectorAll("pre code");
   codeElements.forEach((codeElement) => {
     hljs.highlightElement(codeElement);
